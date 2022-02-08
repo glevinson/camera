@@ -1,12 +1,20 @@
 package ic.doc.camera;
+import java.util.Random;
 
 public class Camera{
 
   private final Sensor sensor;
+  private final MemoryCard memoryCard;
   boolean cameraOn = false;
 
-  public Camera(Sensor sensor) {
-    this.sensor = sensor;
+  public void pressShutter() {
+    if(!cameraOn){
+      return;
+    }
+
+    memoryCard.write(sensor.readData());
+
+    // not implemented
   }
 
   public void powerOn() {
@@ -21,5 +29,8 @@ public class Camera{
     // not implemented
   }
 
+  public Camera(Sensor sensor, MemoryCard memoryCard){
+    this.sensor = sensor;
+    this.memoryCard = memoryCard;
+  }
 }
-
