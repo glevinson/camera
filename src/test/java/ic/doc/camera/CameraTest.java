@@ -64,9 +64,10 @@ public class CameraTest {
     }
 
     @Test
-    public void SensorDoesntPowerDownIfTurnCameraOffAndWritingData() {
+    public void sensorDoesNotPowerDownIfTurnCameraOffAndWritingData() {
 
         takePhoto();
+
         context.checking(new Expectations() {{
             never(sensor).powerDown();
         }});
@@ -76,7 +77,8 @@ public class CameraTest {
     }
 
     @Test
-    public void SensorDoesPowerDownIfTurnCameraOffAndNotWritingData() {
+    public void sensorDoesPowerDownIfTurnCameraOffAndNotWritingData() {
+
         takePhoto();
 
         context.checking(new Expectations() {{
@@ -86,11 +88,10 @@ public class CameraTest {
         // write your test here
         camera.writeComplete();
         camera.powerOff();
-
     }
 
     @Test
-    public void OnceWritingDataHasCompletedThenIfCameraPowerOffThenSensorPowerDown() {
+    public void onceWritingDataHasCompletedThenIfCameraPowerOffThenSensorPowerDown() {
 
         takePhoto();
 
@@ -99,7 +100,6 @@ public class CameraTest {
         }});
 
         // write your test here
-
         camera.powerOff();
         camera.writeComplete();
     }
