@@ -7,60 +7,113 @@ import org.junit.Test;
 
 public class CameraTest {
 
-  @Rule
-  public JUnitRuleMockery context = new JUnitRuleMockery();
+    @Rule
+    public JUnitRuleMockery context = new JUnitRuleMockery();
 
-  Sensor sensor = context.mock(Sensor.class);
-  MemoryCard memoryCard = context.mock(MemoryCard.class);
+    Sensor sensor = context.mock(Sensor.class);
+    MemoryCard memoryCard = context.mock(MemoryCard.class);
 
-  Camera camera = new Camera(sensor, memoryCard);
+    Camera camera = new Camera(sensor, memoryCard);
 
 
-  @Test
-  public void switchingTheCameraOnPowersUpTheSensor() {
-    context.checking(new Expectations() {{
-      exactly(1).of(sensor).powerUp();
-    }});
+    @Test
+    public void switchingTheCameraOnPowersUpTheSensor() {
+        context.checking(new Expectations() {{
+            exactly(1).of(sensor).powerUp();
+        }});
 
-    // write your test here
-    camera.powerOn();
-  }
+        // write your test here
+        camera.powerOn();
+    }
 
-  @Test
-  public void switchingTheCameraOffPowersDownTheSensor() {
-    context.checking(new Expectations() {{
-      exactly(1).of(sensor).powerDown();
-    }});
+    @Test
+    public void switchingTheCameraOffPowersDownTheSensor() {
+        context.checking(new Expectations() {{
+            exactly(1).of(sensor).powerDown();
+        }});
 
-    // write your test here
-    camera.powerOff();
-  }
+        // write your test here
+        camera.powerOff();
+    }
 
-  @Test
-  public void pressingShutterWhenPowerIsOffDoesNothing() {
-    context.checking(new Expectations() {{
-      never(sensor);
-    }});
+    @Test
+    public void pressingShutterWhenPowerIsOffDoesNothing() {
+        context.checking(new Expectations() {{
+            never(sensor);
+        }});
 
-    // write your test here
-    camera.pressShutter();
-  }
+        // write your test here
+        camera.pressShutter();
+    }
 
-  @Test
-  public void pressingShutterWhenPowerIsOnCopiesDataFromSensorToMemoryCard() {
+    @Test
+    public void pressingShutterWhenPowerIsOnCopiesDataFromSensorToMemoryCard() {
 
-    byte[] data = new byte[0];
+        byte[] data = new byte[0];
 
-    context.checking(new Expectations() {{
-      exactly(1).of(sensor).powerUp();
-      exactly(1).of(sensor).readData();
-      will(returnValue(data));
-      exactly(1).of(memoryCard).write(data);
-    }});
+        context.checking(new Expectations() {{
+            exactly(1).of(sensor).powerUp();
+            exactly(1).of(sensor).readData();
+            will(returnValue(data));
+            exactly(1).of(memoryCard).write(data);
+        }});
 
-    // write your test here
-    camera.powerOn();
-    camera.pressShutter();
-  }
+        // write your test here
+        camera.powerOn();
+        camera.pressShutter();
+    }
+
+    @Test
+    public void SensorDoesntPowerDownIfTurnCameraOffAndWritingData() {
+
+        takePhoto();
+        context.checking(new Expectations() {{
+            never(sensor).powerDown();
+        }});
+
+        // write your test here
+        camera.powerOff();
+    }
+
+    @Test
+    public void SensorDoesPowerDownIfTurnCameraOffAndNotWritingData() {
+        takePhoto();
+
+        context.checking(new Expectations() {{
+            exactly(1).of(sensor).powerDown();
+        }});
+
+        // write your test here
+        camera.writeComplete();
+        camera.powerOff();
+
+    }
+
+    @Test
+    public void OnceWritingDataHasCompletedThenIfCameraPowerOffThenSensorPowerDown() {
+
+        takePhoto();
+
+        context.checking(new Expectations() {{
+            exactly(1).of(sensor).powerDown();
+        }});
+
+        // write your test here
+
+        camera.powerOff();
+        camera.writeComplete();
+    }
+
+    private void takePhoto() {
+        byte[] data = new byte[0];
+        context.checking(new Expectations() {{
+            ignoring(sensor).powerUp();
+            allowing(sensor).readData();
+            will(returnValue(data));
+            ignoring(memoryCard).write(data);
+        }});
+        camera.powerOn();
+        camera.pressShutter();
+    }
 
 }
